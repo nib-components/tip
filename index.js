@@ -17,8 +17,14 @@ var Tip = function(options){
     this.el.addClass(options.classes);
   }
 
+  if( options.align ) {
+    this.el.css('text-align', options.align);
+  }
+
   // fixed tip width
-  if( options.width ) this.el.css('width', options.width);
+  if( options.width ) {
+    this.el.css('width', options.width);
+  }
 
   this.popover = new Popover({
     el: this.el,
@@ -54,7 +60,7 @@ Tip.create = function(options){
     });
 
     content.remove();
-    
+
     $this.hover(function(){
       tip.show();
     }, function(){

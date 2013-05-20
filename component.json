@@ -1,6 +1,6 @@
 {
   "name": "tip",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Create tooltips that are positioned relative to an element",
   "dependencies": {
     "nib-components/popover": "0.0.1"
