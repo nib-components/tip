@@ -39,10 +39,11 @@ Tip.create = function(options){
 
   options = _.defaults(options || {}, {
     selector: '.js-tooltip',
-    context: null
+    context: null,
+    classes: options.classes
   });
 
-  $(options.selector, options.context).each(function(){
+  $(options.selector, options.context, options.classes).each(function(){
     if(this.hasAttribute('data-tip-loaded') === true) return;
     this.setAttribute('data-tip-loaded', true);
 
@@ -56,7 +57,8 @@ Tip.create = function(options){
       position: position,
       width: width,
       content: text,
-      target: this
+      target: this,
+      el: options.classes
     });
 
     content.remove();
