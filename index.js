@@ -51,12 +51,14 @@ Tip.create = function(options){
     var text = content.html();
     var position = this.getAttribute('data-tip-position') || 'south';
     var width = this.getAttribute('data-tip-width') || 250;
+    var classes = this.getAttribute('data-tip-class') || options.classes;
 
     var tip = new Tip({
       position: position,
       width: width,
       content: text,
-      target: this
+      target: this,
+      classes: classes
     });
 
     content.remove();
