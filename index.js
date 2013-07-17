@@ -6,7 +6,7 @@ var Tip = function(options){
   this.target = $(options.target);
 
   if( options.el ) {
-    this.el = options.el;
+    this.el = $(options.el);
   }
   else {
     this.el = $('<div class="tip" />');
@@ -39,7 +39,8 @@ Tip.create = function(options){
 
   options = _.defaults(options || {}, {
     selector: '.js-tooltip',
-    context: null
+    context: null,
+    el: options.el
   });
 
   $(options.selector, options.context).each(function(){
@@ -56,7 +57,8 @@ Tip.create = function(options){
       position: position,
       width: width,
       content: text,
-      target: this
+      target: this,
+      el: options.el
     });
 
     content.remove();
