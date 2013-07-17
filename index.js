@@ -6,7 +6,7 @@ var Tip = function(options){
   this.target = $(options.target);
 
   if( options.el ) {
-    this.el = $(options.el);
+    this.el = options.el;
   }
   else {
     this.el = $('<div class="tip" />');
