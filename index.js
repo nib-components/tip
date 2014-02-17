@@ -1,29 +1,31 @@
-var Popover = require('popover');
+var Popover = require('popover'),
+  emitter = require('emitter');
 
 var Tip = function(options){
-  _.bindAll(this, 'hide', 'show');
-
-  this.target = $(options.target);
+  this.hide = this.hide.bind(this);
+  this.show = this.show.bind(this);
+  this.target = options.target;
 
   if( options.el ) {
     this.el = options.el;
   }
   else {
-    this.el = $('<div class="tip" />');
+    this.el = document.createElement('div');
+    this.el.classList.add('tip');
     this.setContent(options.content);
   }
 
   if( options.classes ) {
-    this.el.addClass(options.classes);
+    this.el.classList.add(options.classes);
   }
 
   if( options.align ) {
-    this.el.css('text-align', options.align);
+    this.el.style.textAlign = options.align;
   }
 
   // fixed tip width
   if( options.width ) {
-    this.el.css('width', options.width);
+    this.el.style.width = options.width;
   }
 
   this.popover = new Popover({
@@ -35,67 +37,74 @@ var Tip = function(options){
   this.isVisible = false;
 };
 
+/**
+ + * Allow the Tip to trigger events
+ + */
+emitter(Tip.prototype);
+
+Tip.prototype.dispose = function(){
+  this.hide();
+  this.el.remove();
+  this.off();
+  this.emit('tooltip disposed');
+};
+
+Tip.prototype.hide = function(){
+  this.popover.hide();
+  this.el.classList.remove('is-visible');
+  this.isVisible = false;
+  this.emit('tooltip hidden');
+};
+
+Tip.prototype.show = function(){
+  this.popover.show();
+  this.el.classList.add('is-visible');
+  this.isVisible = true;
+  this.emit('tooltip visible');
+};
+
+Tip.prototype.setContent = function(val){
+  this.el.innerHTML = val;
+};
+
+// Create a tooltip
 Tip.create = function(options){
+  this.options = options || {};
+  this.selector = options.selector || '.js-tooltip';
+  this.context = options.context || null;
+  this.classes = options.classes || null;
 
-  options = _.defaults(options || {}, {
-    selector: '.js-tooltip',
-    context: null
-  });
+  var tips = document.querySelectorAll(this.selector);
 
-  $(options.selector, options.context).each(function(){
-    if(this.hasAttribute('data-tip-loaded') === true) return;
-    this.setAttribute('data-tip-loaded', true);
+  [].forEach.call(tips, function(el){
 
-    var $this = $(this);
-    var content = $this.find('.js-tooltip-content');
-    var text = content.html();
-    var position = this.getAttribute('data-tip-position') || 'south';
-    var width = this.getAttribute('data-tip-width') || 250;
-    var classes = this.getAttribute('data-tip-class') || options.classes;
+    el.addEventListener('mouseover', function(){
+       tip.show();
+    });
+
+    el.addEventListener('mouseout', function(){
+       tip.hide();
+    });
+
+    if(el.hasAttribute('data-tip-loaded') === true) return;
+    el.setAttribute('data-tip-loaded', true);
+
+    var content = el.querySelector('.js-tooltip-content'),
+      text = content.innerHTML,
+      position = el.getAttribute('data-tip-position') || 'south',
+      width = el.getAttribute('data-tip-width') || 250,
+      classes = el.getAttribute('data-tip-class') || this.classes;
 
     var tip = new Tip({
       position: position,
       width: width,
       content: text,
-      target: this,
+      target: el,
       classes: classes
     });
 
-    content.remove();
-
-    $this.hover(function(){
-      tip.show();
-    }, function(){
-      tip.hide();
-    });
-
+    content.classList.add('is-hidden');
   });
 };
-
-_.extend(Tip.prototype, Backbone.Events, {
-
-  dispose: function(){
-    this.hide();
-    this.el.remove();
-    this.off();
-  },
-
-  hide: function(){
-    this.popover.hide();
-    this.el.removeClass('is-visible');
-    this.isVisible = false;
-  },
-
-  show: function(){
-    this.popover.show();
-    this.el.addClass('is-visible');
-    this.isVisible = true;
-  },
-
-  setContent: function(val){
-    this.el.html(val);
-  }
-
-});
 
 module.exports = Tip;
